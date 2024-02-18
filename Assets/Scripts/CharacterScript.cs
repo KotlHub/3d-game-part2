@@ -44,6 +44,6 @@ public class CharacterScript : MonoBehaviour
         playerVelocityY += gravityValue * Time.deltaTime;
 
         characterController.Move(Time.deltaTime * (speed * (dx * Camera.main.transform.right + dy * horizontalForward) + playerVelocityY * Vector3.up));
-
+        this.transform.forward = horizontalForward;
     }
 }
