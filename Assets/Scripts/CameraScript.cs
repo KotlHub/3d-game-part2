@@ -1,32 +1,32 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraScript : MonoBehaviour
 {
     [SerializeField]
-    private GameObject cameraAnchor;
-    private Vector3 cameraAngles;
-    private Vector3 cameraOffset;
-    private Vector3 initialAngles;
+    private GameObject cameraAnchor; // точка камери для FPV
+    private Vector3 cameraAngles; // кути Ейлера повороту камери
+    private Vector3 cameraOffset; // зміщення камери від персонажу
+    private Vector3 initialAngles; // кути на момент старту гри
     private Vector3 initialOffset;
-    // Start is called before the first frame update
+
     void Start()
     {
         initialAngles = cameraAngles = this.transform.eulerAngles;
         initialOffset = cameraOffset = this.transform.position - cameraAnchor.transform.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        cameraAngles.y += Input.GetAxis("Mouse X");
+        cameraAngles.y += Input.GetAxis("Mouse X");  
         cameraAngles.x -= Input.GetAxis("Mouse Y");
         if (Input.GetKeyUp(KeyCode.V))
         {
-            cameraOffset = (cameraOffset == Vector3.zero) ?  initialOffset: Vector3.zero;
+            cameraOffset = (cameraOffset == Vector3.zero) 
+                ? initialOffset 
+                : Vector3.zero;
         }
-
     }
 
     private void LateUpdate()
