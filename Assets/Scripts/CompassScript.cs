@@ -11,10 +11,14 @@ public class CompassScript : MonoBehaviour
     private GameObject coin;
 
     private GameObject arrow;
+    private GameObject content;
 
     void Start()
     {
-        arrow = GameObject.Find("CompassArrow");
+        arrow = GameObject.Find("CompassContentArrow");
+        content = GameObject.Find("CompassContent");
+        GameState.Subscribe(OnGameStateChange);
+        OnGameStateChange(nameof(GameState.isCompassVisible));
     }
 
     void Update()
@@ -28,5 +32,18 @@ public class CompassScript : MonoBehaviour
             character.transform.forward,
             toCoin,
             Vector3.down));
+    }
+
+    private void OnGameStateChange(string propertyName)
+    {
+        if(propertyName == nameof(GameState.isCompassVisible))
+        {
+            content.SetActive(GameState.isCompassVisible);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        GameState.Unsubscribe(OnGameStateChange);
     }
 }

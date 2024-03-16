@@ -24,10 +24,11 @@ public class DayNightScript : MonoBehaviour
     void Update()
     {
         dayPhase += Time.deltaTime / dayPeriod;
-        if (dayPhase > 1f)
+        if (dayPhase > 1)
         {
             dayPhase -= 1f;
         }
+        this.transform.eulerAngles = new Vector3(0, 0, 360 * dayPhase);
         bool isNight = dayPhase > 0.25f && dayPhase < 0.75f;
         if (isNight)
         {
@@ -35,6 +36,7 @@ public class DayNightScript : MonoBehaviour
             {
                 RenderSettings.skybox = nightSkybox;
             }
+            
         }
         else
         {
@@ -43,12 +45,12 @@ public class DayNightScript : MonoBehaviour
                 RenderSettings.skybox = daySkybox;
             }
         }
-
         float k = LuxFactor(dayPhase);
-        sun.intensity = isNight ? k * nightFactor : k;
+        sun.intensity = RenderSettings.ambientIntensity = isNight ? k * nightFactor : k;
         RenderSettings.skybox.SetFloat("_Exposure", k);
-        RenderSettings.ambientIntensity = k;
+
     }
+
 
     // Крива зміни добової освітленості t[0..1] 
     // 0 - південь, 0.25 - сутінки, 0.5 - північ, 0.75 - світанок

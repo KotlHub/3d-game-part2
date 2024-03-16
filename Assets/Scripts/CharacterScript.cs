@@ -63,19 +63,20 @@ public class CharacterScript : MonoBehaviour
         horizontalForward = horizontalForward.normalized;
 
         float ds = Time.deltaTime / 5.0f;
-        if(Input.GetKey(KeyCode.LeftShift) && (dx != 0 || dy != 0))
+        if (Input.GetKey(KeyCode.LeftShift) && (dx != 0 || dy != 0))
         {
-            
-            if(GameState.CharacterStamina > ds)
-            { 
+
+            if (GameState.CharacterStamina > ds)
+            {
                 dx *= 2.5f;
                 dy *= 2.5f;
                 GameState.CharacterStamina -= ds;
             }
+
         }
         else
         {
-            if(GameState.CharacterStamina < 1 - ds)
+            if (GameState.CharacterStamina < 1 - ds)
             {
                 GameState.CharacterStamina += ds;
             }
@@ -84,7 +85,6 @@ public class CharacterScript : MonoBehaviour
                 GameState.CharacterStamina = 1f;
             }
         }
-
         playerVelocityY += gravityValue * Time.deltaTime;
 
         _characterController.Move(Time.deltaTime *

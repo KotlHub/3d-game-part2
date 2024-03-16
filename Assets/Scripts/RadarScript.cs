@@ -1,36 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class RadarScript : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject coin;
+
     [SerializeField]
     private GameObject character;
+    [SerializeField]
+    private GameObject coin;
+
     private Image pointer;
-    // Start is called before the first frame update
+
+    private float maxRange = 30f;
+    private Rect size;
+
+    private GameObject content;
+
     void Start()
     {
-        pointer = GameObject.Find("RadarPointer").GetComponent<Image>();
+        content = GameObject.Find("RadarContent");
+        pointer = GameObject.Find("RadarContentPointer").GetComponent<Image>();
+        size = GameObject.Find("Radar").GetComponent<RectTransform>().rect;
+        GameState.Subscribe(OnGameStateChange);
+        OnGameStateChange(nameof(GameState.isRadarVisible));
     }
 
-    // Update is called once per frame
     void Update()
     {
         Vector3 toCoin = coin.transform.position - character.transform.position;
-        toCoin.y = 0;  // проєкція - приведення векторів до однієї площини
-                       // інакше між ними лишається кут у вертикальній площині
-                       // character.transform.forward підтримується горизонтальним у CharacterScript
-        
-           float angle = Vector3.SignedAngle(
+        toCoin.y = 0;
+
+        float angle = Vector3.SignedAngle(
             character.transform.forward,
             toCoin,
             Vector3.up) * Mathf.Deg2Rad;
+
         float range = toCoin.magnitude;
-        if(range < 30)
+
+        if (range > maxRange)
         {
             pointer.gameObject.SetActive(false);
         }
@@ -38,9 +47,22 @@ public class RadarScript : MonoBehaviour
         {
             pointer.gameObject.SetActive(true);
             pointer.rectTransform.localPosition = new Vector3(
-                range * Mathf.Sin(angle),
-                range * Mathf.Cos(angle),
+                range / maxRange * size.width / 2.0f * Mathf.Sin(angle),
+                range / maxRange * size.height / 2.0f * Mathf.Cos(angle),
                 0);
         }
+    }
+
+    private void OnGameStateChange(string propertyName)
+    {
+        if (propertyName == nameof(GameState.isRadarVisible))
+        {
+            content.SetActive(GameState.isRadarVisible);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        GameState.Unsubscribe(OnGameStateChange);
     }
 }
