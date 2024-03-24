@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 public class GameState
 {
+    #region Stamina
     private static float _characterStamina;
     public static float CharacterStamina
     {
@@ -18,6 +20,8 @@ public class GameState
             }
         }
     }
+    #endregion
+    #region isCompassVisible
     private static bool _isCompassVisible;
     public static bool isCompassVisible
     {
@@ -31,7 +35,8 @@ public class GameState
             }
         }
     }
-
+    #endregion
+    #region isRadarVisible
     private static bool _isRadarVisible;
     public static bool isRadarVisible
     {
@@ -45,8 +50,76 @@ public class GameState
             }
         }
     }
+    #endregion
+    #region isHintsVisible
+    private static bool _isHintsVisible;
+    public static bool isHintsVisible
+    {
+        get => _isHintsVisible;
+        set
+        {
+            if (value != _isHintsVisible)
+            {
+                _isHintsVisible = value;
+                NotifySubscribers(nameof(isHintsVisible));
+            }
+        }
+    }
+    #endregion
+    #region Score
+    private static float _score;
+    public static float Score
+    {
+        get => _score;
+        set
+        {
+            if (value != _score)
+            {
+                _score = value;
+                NotifySubscribers(nameof(Score));
+            }
+        }
+    }
+    #endregion
+    #region CoinCost
+    private static float _coinCoost;
+    public static float CoinCost => _coinCoost;
+    // "вартість" однієї монети в залежності від складності гри
+    public static float UpdateCoinCost() => _coinCoost =
+        1f
+        * (isCompassVisible ? 1f : 1.1f)
+        * (isRadarVisible ? 1f : 1.1f)
+        * (isHintsVisible ? 1f : 1.1f)
+        * (isCompassVisible || isRadarVisible || isHintsVisible ? 1f : 1.5f);
+    private static void OnCoinCostChange(string propName)
+    {
+        if (propName == nameof(isCompassVisible) ||
+            propName == nameof(isRadarVisible) ||
+            propName == nameof(isHintsVisible))
+        {
+            UpdateCoinCost();
+            NotifySubscribers(nameof(CoinCost));
+        }
+    }
+    #endregion
+    #region GameMessages
+    private static List<GameMessage> gameMessages = new();
+    public static ReadOnlyCollection<GameMessage> GameMessages =>
+        new(gameMessages);
+    public static void AddGameMessage(GameMessage message)
+    {
+        gameMessages.Add(message);
+        NotifySubscribers(nameof(GameMessages));
+    }
+    public static void RemoveGameMessage(GameMessage message)
+    {
+        gameMessages.Remove(message);
+        NotifySubscribers(nameof(GameMessages));
+    }
+    #endregion
 
-    public static List<Action<String>> Subscribers { get; } = new();
+
+    public static List<Action<String>> Subscribers { get; } = new() { OnCoinCostChange };
     public static void Subscribe(Action<String> action) =>
         Subscribers.Add(action);
     public static void Unsubscribe(Action<String> action) =>

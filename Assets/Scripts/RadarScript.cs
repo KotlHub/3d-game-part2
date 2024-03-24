@@ -11,20 +11,19 @@ public class RadarScript : MonoBehaviour
     [SerializeField]
     private GameObject coin;
 
+    private GameObject content;
     private Image pointer;
-
-    private float maxRange = 30f;
     private Rect size;
 
-    private GameObject content;
+    private float maxRange = 30f;
 
     void Start()
     {
         content = GameObject.Find("RadarContent");
         pointer = GameObject.Find("RadarContentPointer").GetComponent<Image>();
         size = GameObject.Find("Radar").GetComponent<RectTransform>().rect;
-        GameState.Subscribe(OnGameStateChange);
-        OnGameStateChange(nameof(GameState.isRadarVisible));
+        GameState.Subscribe(OnGameStateChanged);
+        OnGameStateChanged(nameof(GameState.isRadarVisible));
     }
 
     void Update()
@@ -52,17 +51,15 @@ public class RadarScript : MonoBehaviour
                 0);
         }
     }
-
-    private void OnGameStateChange(string propertyName)
+    private void OnGameStateChanged(string propName)
     {
-        if (propertyName == nameof(GameState.isRadarVisible))
+        if (propName == nameof(GameState.isRadarVisible))
         {
             content.SetActive(GameState.isRadarVisible);
         }
     }
-
     private void OnDestroy()
     {
-        GameState.Unsubscribe(OnGameStateChange);
+        GameState.Unsubscribe(OnGameStateChanged);
     }
 }

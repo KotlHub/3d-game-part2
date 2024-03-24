@@ -16,17 +16,26 @@ public class CoinScript : MonoBehaviour
         _animator = GetComponent<Animator>();
         initialCoinHeight = this.transform.position.y -
             Terrain.activeTerrain.SampleHeight(this.transform.position);
+        GameState.Subscribe(OnGameStateChange);
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
             _animator.SetInteger("State", 1);
+            
         }
     }
     public void OnDisappearFinish()
     {
+        GameState.Score += GameState.CoinCost;
         //Debug.Log("OnDisappearFinish");
+        Respawn();
+        GameState.AddGameMessage(new() { Text = $"Earned {GameState.CoinCost:F1} scores" });
+        _animator.SetInteger("State", 0);
+    }
+    private void Respawn()
+    {
         Vector3 newPosition;
         float distance;
         int lim = 100;
@@ -49,6 +58,19 @@ public class CoinScript : MonoBehaviour
         newPosition.y > 1000 - minSpawnOffset));
 
         transform.position = newPosition;
-        _animator.SetInteger("State", 0);
+    }
+
+    private void OnGameStateChange(string propName)
+    {
+        if (propName == nameof(GameState.CoinCost))
+        {
+            Respawn();
+            GameState.AddGameMessage(new() { Text = $"Coin has been replaced. New price: {GameState.CoinCost:F1}" });
+        }
+    }
+    private void OnDestroy()
+    {
+        GameState.Unsubscribe(OnGameStateChange);
+        
     }
 }

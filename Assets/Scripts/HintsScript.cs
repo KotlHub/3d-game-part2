@@ -8,13 +8,17 @@ public class HintsScript : MonoBehaviour
     [SerializeField]
     private GameObject coin;
 
+    private GameObject content;
     private GameObject leftArrow;
     private GameObject rightArrow;
 
     void Start()
     {
-        leftArrow = GameObject.Find("HintsLeftArrow");
-        rightArrow = GameObject.Find("HintsRightArrow");
+        content = GameObject.Find("HintsContent");
+        leftArrow = GameObject.Find("HintsContentLeftArrow");
+        rightArrow = GameObject.Find("HintsContentRightArrow");
+        GameState.Subscribe(OnGameStateChanged);
+        OnGameStateChanged(nameof(GameState.isHintsVisible));
     }
 
     void Update()
@@ -69,5 +73,16 @@ public class HintsScript : MonoBehaviour
                 Camera.main.transform.position,
                 Vector3.down));
         }
+    }
+    private void OnGameStateChanged(string propName)
+    {
+        if (propName == nameof(GameState.isHintsVisible))
+        {
+            content.SetActive(GameState.isHintsVisible);
+        }
+    }
+    private void OnDestroy()
+    {
+        GameState.Unsubscribe(OnGameStateChanged);
     }
 }
