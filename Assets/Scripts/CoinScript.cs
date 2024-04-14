@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class CoinScript : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject parentObj;
+
+    private List<GameObject> childObjects = new List<GameObject>();
+
+    private int currentObj = 0;
+
     private Animator _animator;
     const float minSpawnOffset = 50f;
     float minSpawnDistance = 20f;
@@ -13,9 +20,12 @@ public class CoinScript : MonoBehaviour
     float initialCoinHeight;
     void Start()
     {
+        for (int i = 0; i < parentObj.transform.childCount; i++)
+        {
+            childObjects.Add(parentObj.transform.GetChild(i).gameObject);
+        }
+
         _animator = GetComponent<Animator>();
-        initialCoinHeight = this.transform.position.y -
-            Terrain.activeTerrain.SampleHeight(this.transform.position);
         GameState.Subscribe(OnGameStateChange);
     }
     private void OnTriggerEnter(Collider other)
@@ -23,7 +33,7 @@ public class CoinScript : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             _animator.SetInteger("State", 1);
-            
+
         }
     }
     public void OnDisappearFinish()
@@ -36,28 +46,13 @@ public class CoinScript : MonoBehaviour
     }
     private void Respawn()
     {
-        Vector3 newPosition;
-        float distance;
-        int lim = 100;
-        do
-        {
-            newPosition = transform.position +
-                Vector3.forward * Random.Range(-maxSpawnDistance, maxSpawnDistance) +
-                Vector3.left * Random.Range(-maxSpawnDistance, maxSpawnDistance);
-
-            newPosition.y = initialCoinHeight * Random.Range(minHeightFactor, maxHeightFactor) +
-                Terrain.activeTerrain.SampleHeight(newPosition);
-
-            distance = Vector3.Distance(newPosition, transform.position);
-            lim--;
-        } while (lim > 0 && (distance < minSpawnDistance ||
-        distance > minSpawnDistance ||
-        newPosition.x < minSpawnOffset ||
-        newPosition.x > 1000 - minSpawnOffset ||
-        newPosition.y < minSpawnOffset ||
-        newPosition.y > 1000 - minSpawnOffset));
+        currentObj++;
+        Vector3 newPosition = new Vector3(childObjects[currentObj].transform.position.x,
+                                          childObjects[currentObj].transform.position.y + 2,
+                                          childObjects[currentObj].transform.position.z);
 
         transform.position = newPosition;
+
     }
 
     private void OnGameStateChange(string propName)
@@ -71,6 +66,6 @@ public class CoinScript : MonoBehaviour
     private void OnDestroy()
     {
         GameState.Unsubscribe(OnGameStateChange);
-        
+
     }
 }
