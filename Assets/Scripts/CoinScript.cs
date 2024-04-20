@@ -9,15 +9,14 @@ public class CoinScript : MonoBehaviour
 
     private List<GameObject> childObjects = new List<GameObject>();
 
-    private int currentObj = 0;
 
     private Animator _animator;
-    const float minSpawnOffset = 50f;
-    float minSpawnDistance = 20f;
-    float maxSpawnDistance = 30f;
-    float maxHeightFactor = 1.5f;
-    float minHeightFactor = 0.7f;
-    float initialCoinHeight;
+    //const float minSpawnOffset = 50f;
+    //float minSpawnDistance = 20f;
+    //float maxSpawnDistance = 30f;
+    //float maxHeightFactor = 1.5f;
+    //float minHeightFactor = 0.7f;
+    //float initialCoinHeight;
     void Start()
     {
         for (int i = 0; i < parentObj.transform.childCount; i++)
@@ -46,10 +45,10 @@ public class CoinScript : MonoBehaviour
     }
     private void Respawn()
     {
-        currentObj++;
-        Vector3 newPosition = new Vector3(childObjects[currentObj].transform.position.x,
-                                          childObjects[currentObj].transform.position.y + 2,
-                                          childObjects[currentObj].transform.position.z);
+        int randomIndex = Random.Range(0, childObjects.Count);
+        Vector3 newPosition = new Vector3(childObjects[randomIndex].transform.position.x,
+                                          childObjects[randomIndex].transform.position.y + 2,
+                                          childObjects[randomIndex].transform.position.z);
 
         transform.position = newPosition;
 

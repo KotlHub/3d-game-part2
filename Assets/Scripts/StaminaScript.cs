@@ -16,7 +16,7 @@ public class StaminaScript : MonoBehaviour
 
     private void OnGameStateChange(string propName)
     {
-        if (propName == nameof(GameState.CharacterStamina))
+        if (propName == nameof(GameState.CharacterStamina) && indicator != null)
         {
             indicator.fillAmount = GameState.CharacterStamina;
         }
